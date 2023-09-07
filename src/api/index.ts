@@ -1,8 +1,8 @@
 // 引入 axios 实例
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, {AxiosInstance, AxiosRequestConfig} from 'axios';
 import {RequestConfig, responseCode} from './type';
-import { getToken } from '@/utils/cookies';
+import {getToken} from '@/utils/cookies';
 import {message} from "ant-design-vue";
 
 
@@ -18,7 +18,9 @@ export interface ResultData<T> {
     results: T,
     count: number
 }
+
 export type APiResponse<T> = Promise<Response<T>>;
+export type APIResponseList<T> = APiResponse<ResultData<T>>;
 
 class Request {
     private _instance: AxiosInstance // axios实例
@@ -38,15 +40,15 @@ class Request {
             (error) => Promise.reject(error),
         );
         this._instance.interceptors.response.use((response) => {
-            const { data } = response;
+            const {data} = response;
             return data;
         }, (error) => {
             const response = error.response
-            const {data,status}=response
-            if (status>=responseCode.Error ){
+            const {data, status} = response
+            if (status >= responseCode.Error) {
                 // 服务端错误
                 message.error(data.error)
-            }else {
+            } else {
                 message.info(data.msg)
             }
             // 超出 2xx 范围的状态码都会触发该函数。

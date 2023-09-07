@@ -14,7 +14,7 @@
             <a-menu-item key="2" style="margin-left: auto">
                 <a-dropdown>
                     <a class="ant-dropdown-link" @click.prevent>
-                        <a-avatar :src="user.avatar" :size="25" style="background-color: #7265e6;">
+                        <a-avatar :src="user.avatar" :size="25" >
                             {{ user.username.slice(0, 1) }}
                         </a-avatar>
 
@@ -122,7 +122,7 @@ import {useUserStore} from "@/store/modules/user.ts";
 import {useRoute} from "vue-router";
 import {usePermissionStore} from "@/store/modules/permission.ts";
 import {removeToken} from "@/utils/cookies.ts";
-import {ref, watch, computed, nextTick} from "vue";
+import {ref, watch, computed} from "vue";
 
 import {useConfigStore} from "@/store/modules/config.ts";
 import {Route} from "@/components/layout/header/types.ts";

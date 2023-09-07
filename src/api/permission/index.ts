@@ -10,7 +10,7 @@ import request, {APiResponse} from "@/api";
 const getRoutes = async () => {
     return await request.get<APiResponse<any[]>>({
         isAuth: true,
-        url: '/permission'
+        url: '/user/permission'
     })
 }
 export {

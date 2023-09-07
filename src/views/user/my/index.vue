@@ -21,7 +21,7 @@
         <a-space direction="vertical" style="width: 100%">
 
             <p>昵称：{{ user.name }}</p>
-            <p>性别：{{ user.sex }}</p>
+            <p>性别：{{ getSexName(user.sex) }}</p>
             <p>邮箱：{{ user.email }}</p>
             <p>职责：
                 <a-tag v-for="role in user.roles" :key="role">
@@ -42,10 +42,10 @@
                 <a-input v-model:value="formState.email"/>
             </a-form-item>
             <a-form-item label="性别">
-                <a-radio-group v-model:value="formState.sex">
-                    <a-radio :value="0" name="type">男</a-radio>
-                    <a-radio :value="1" name="type">女</a-radio>
-                    <a-radio :value="2" name="type">保密</a-radio>
+                <a-radio-group v-model:value.number="formState.sex">
+                    <a-radio v-for="(item,idx) in SexMap" :value="idx" :key="item">
+                        {{ item }}
+                    </a-radio>
                 </a-radio-group>
             </a-form-item>
             <a-form-item label="描述">
@@ -72,6 +72,7 @@ import {EditOutlined} from "@ant-design/icons-vue";
 import useQiniu from "@/utils/qiniu/cos.ts";
 import {getKodo} from "@/api/credit";
 import {createValidateFileExtension, ImageTypes, isOverSize} from "@/utils/file/valid.ts";
+import {getSexName, SexMap} from "../../../enums/user.ts";
 
 defineOptions({
     name: "my"
@@ -96,7 +97,7 @@ const handleOk = async () => {
         open.value = false;
         message.success("更新成功")
     } catch (e) {
-        message.success('更新失败')
+        console.log(e)
     }
 }
 /**

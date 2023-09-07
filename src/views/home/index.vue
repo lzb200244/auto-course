@@ -16,7 +16,11 @@
                     <a-card :bordered="false">
                         <template #title>
                         </template>
-                        <router-view/>
+                        <transition name="slide" mode="out-in">
+                            <router-view/>
+
+
+                        </transition>
                     </a-card>
                 </a-layout-content>
             </a-layout>

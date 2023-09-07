@@ -51,11 +51,12 @@
                             label="是否缓存">
                         <a-switch v-model:checked="formState.meta.keepAlive"/>
                     </a-form-item>
-                    <a-form-item name="limit" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
-                        <a-radio-group v-model:value.number="formState.limit">
-                            <a-radio :value="1">学生</a-radio>
-                            <a-radio :value="2">教师</a-radio>
-                            <a-radio :value="3">管理员</a-radio>
+                    <a-form-item name="property" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
+                        <a-radio-group v-model:value.number="formState.property">
+                            <a-radio v-for="key in roleMap" :key="key[0]" :value="key[0]">
+                                {{ key[1] }}
+                            </a-radio>
+
                         </a-radio-group>
                     </a-form-item>
 
@@ -143,11 +144,11 @@
                     label="是否缓存">
                 <a-switch v-model:checked="updateForm.meta.keepAlive"/>
             </a-form-item>
-            <a-form-item name="limit" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
-                <a-radio-group v-model:value.number="updateForm.limit">
-                    <a-radio :value="1">学生</a-radio>
-                    <a-radio :value="2">教师</a-radio>
-                    <a-radio :value="3">管理员</a-radio>
+            <a-form-item name="property" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
+                <a-radio-group v-model:value.number="updateForm.property">
+                    <a-radio v-for="key in roleMap" :key="key[0]" :value="key[0]">
+                        {{ key[1] }}
+                    </a-radio>
                 </a-radio-group>
             </a-form-item>
 
@@ -156,7 +157,7 @@
                     label="父组件" :rules="[{ required: true, message: '请输入父组件' }]">
                 <a-input v-model:value="updateForm.parent" type="number"/>
             </a-form-item>
-            <a-form-item >
+            <a-form-item>
                 <a-button type="primary" @click="submitForm">提交</a-button>
             </a-form-item>
         </a-form>
@@ -164,15 +165,16 @@
 </template>
 <script lang="ts" setup>
 import {computed, reactive, ref, watch} from 'vue';
-import {Route} from "@/types/request/admin.ts";
+import {RouteReq} from "@/types/request/admin.ts";
 import {createPage, updatePage} from "@/api/admin";
 import {message} from "ant-design-vue";
 import {usePermissionStore} from "@/store/modules/permission.ts";
+import {roleMap} from "@/enums/user";
 
 const radio = ref(1)
 const usePermission = usePermissionStore()
 const myPages = computed(() => usePermission.myPages)
-const formState = reactive<Route>(
+const formState = reactive<RouteReq>(
     {
         path: '',
         redirect: '', component: "", name: "",
@@ -183,10 +185,10 @@ const formState = reactive<Route>(
         },
         disable: false,
         parent: 1,
-        limit: 0
+        property: 0
     }
 );
-const updateForm = reactive<Route>(
+const updateForm = reactive<RouteReq>(
     {
         path: '',
         redirect: '', component: "", name: "",
@@ -197,7 +199,7 @@ const updateForm = reactive<Route>(
         },
         disable: false,
         parent: 1,
-        limit: 0
+        property: 0
     }
 );
 const formRef = ref();
