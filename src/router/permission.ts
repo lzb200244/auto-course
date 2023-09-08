@@ -4,6 +4,7 @@ import {Router} from "vue-router";
 import {usePermissionStore} from "@/store/modules/permission.ts";
 import NProgress from "@/utils/progress";
 import {useConfigStore} from "@/store/modules/config.ts";
+import {filterAsnycRouter} from "@/router/importRoutercom.ts";
 
 const WHITE_LIST = [
     'login', 'register'
@@ -30,20 +31,29 @@ const createRouterGuards = (router: Router) => {
             }
             if (access_token) {
                 const usePermission = usePermissionStore()
+                const useConfig = useConfigStore()
                 const useUser = useUserStore()
-                await usePermission.getRoutes()
                 await useUser.getUser()
-
+                if (usePermission.myPages.length === 0) {
+                    // 添加动态路由
+                    await usePermission.getRoutes()
+                    filterAsnycRouter(usePermission.myPages).forEach(
+                        (route: any) => {
+                            router.addRoute(route)
+                        }
+                    )
+                    next({...to, replace: true}) // 这里相当于push到一个页面 不在进入路由拦截
+                    useConfig.GlobalConf.init = true
+                    return
+                }
             }
             next();
 
         }
     )
     router.afterEach(() => {
-        setTimeout(() => {
-            const useConfig = useConfigStore()
-            useConfig.GlobalConf.init = true
-        }, 1000)
+
+
         NProgress.done();
     });
 

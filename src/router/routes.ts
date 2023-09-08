@@ -14,9 +14,8 @@ const defaultRoutes: RouteRecordRaw[] = [
     {
         path: "/register",
         name: "register",
-        component: () => {
-            return import('@/views/auth/register');
-        },
+        component: () => import('@/views/auth/register')
+        ,
         meta: {
             title: '注册',
             keepAlive: true,

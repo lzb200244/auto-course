@@ -17,8 +17,7 @@
                         <template #title>
                         </template>
                         <transition name="slide" mode="out-in">
-                            <router-view/>
-
+                            <router-view v-if="GlobalConf.init" />
 
                         </transition>
                     </a-card>

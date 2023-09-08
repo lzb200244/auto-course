@@ -17,6 +17,8 @@ interface Response<T> {
 export interface ResultData<T> {
     results: T,
     count: number
+    page: number
+    size: number
 }
 
 export type APiResponse<T> = Promise<Response<T>>;

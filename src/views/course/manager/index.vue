@@ -44,8 +44,8 @@
                              name="categoryID">
                     <a-input v-model:value.number="createForm.categoryID"/>
                 </a-form-item>
-                <a-form-item label="课程时间"
-                             :rules="[{ required: true, message: '请输入课程时间' }]"
+                <a-form-item label="上课时间"
+                             :rules="[{ required: true, message: '请输入上课时间' }]"
                              name="schedule">
                     <a-time-range-picker
                             :format="scheduleRangeFormat"
@@ -65,13 +65,30 @@
         </a-drawer>
     </a-row>
     <a-row>
-        <a-table style="width: 100%" :dataSource="courseList" :columns="columns">
+        <a-table
+                :row-key="record=>record.id"
+                style="width: 100%"
+                :dataSource="courseList"
+                :columns="courseColumns"
+                :pagination="pagination"
+                @change="handleTableChange"
+        >
             <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'action'">
-                    <a-button @click="showPublishMedal(record.id)">发布</a-button>
-                    <a-button type="link" danger>删除</a-button>
-
-
+                    <a-button @click="showPublishModal(record.id)">发布</a-button>
+                    <a-popconfirm
+                            title="是否确认删除该课程"
+                            ok-text="确认"
+                            cancel-text="取消"
+                    >
+                        <a-button type="link" danger>删除</a-button>
+                    </a-popconfirm>
+                </template>
+                <template v-if="column.dataIndex === 'startTime'">
+                    <span>{{ dayjs(record.startTime).format('YYYY-MM-DD') }}</span>
+                </template>
+                <template v-if="column.dataIndex === 'endTime'">
+                    <span>{{ dayjs(record.endTime).format('YYYY-MM-DD') }}</span>
                 </template>
             </template>
         </a-table>
@@ -100,86 +117,26 @@
     </a-row>
 </template>
 <script setup lang="ts">
-import {Dayjs} from 'dayjs';
-import {computed, reactive, ref, watch,} from "vue";
+import dayjs, {Dayjs} from 'dayjs';
 import {CourseReq} from "@/types/request/course.ts";
-import {createCourse} from "@/api/course";
+import {computed, reactive, ref, watch,} from "vue";
 import {message} from "ant-design-vue";
-import {useCourseStore} from "@/store/modules/course.ts";
+import {courseColumns} from "@/consts/columns.ts";
 import {dateRangeFormat, scheduleRangeFormat} from "@/enums/days.ts";
+import usePager, {Pager} from "@/hooks/pages";
+import {createCourse} from "@/api/course";
+import {useCourseStore} from "@/store/modules/course.ts";
 
-const useCourse = useCourseStore()
-useCourse.getCourseList()
+
+const {pagination, pageRange, Max, setMax} = usePager()
 const createFormRef = ref();
 const dateRange = ref<[Dayjs, Dayjs]>([]);
 const scheduleRange = ref<[Dayjs, Dayjs]>([]);
-const columns = ref([
-    {
-        title: '课程id',
-        dataIndex: 'id',
-        key: 'id',
-    },
-    {
-        title: '标题',
-        dataIndex: 'title',
-        key: 'title',
-    },
-    {
-        title: '描述',
-        dataIndex: 'desc',
-        key: 'desc',
-    },
-    {
-        title: '讲师',
-        dataIndex: 'teacher',
-        key: 'teacher',
-    },
-    {
-        title: '课程代码',
-        dataIndex: 'code',
-        key: 'code',
-    },
-    {
-        title: '容量',
-        dataIndex: 'capacity',
-        key: 'capacity',
-    },
-    {
-        title: '学分',
-        dataIndex: 'credit',
-        key: 'credit',
-    },
-    {
-        title: '分类',
-        dataIndex: 'categoryID',
-        key: 'categoryID',
-    },
-    {
-        title: '上课时间',
-        dataIndex: 'schedule',
-        key: 'schedule',
-    },
-    {
-        title: '开课时间',
-        dataIndex: 'startTime',
-        key: 'startTime',
-
-    },
-    {
-        title: '结课时间',
-        dataIndex: 'endTime',
-        key: 'endTime',
-    },
-    {
-        title: '操作',
-        dataIndex: 'action',
-        key: 'action',
-    }
-
-])
 const createState = ref<boolean>(false);
 const publishState = ref<boolean>(false);
-const courseList = computed(() => useCourse.courseList)
+const courseList = computed(() => {
+    return useCourse.courseList.slice(pageRange.value[0], pageRange.value[1])
+})
 const createForm = reactive<CourseReq>({
     title: '',
     desc: '',
@@ -195,6 +152,10 @@ const publishForm = reactive({
     capacity: 0,
     courseID: 0
 })
+const useCourse = useCourseStore()
+useCourse.getCourseList().then(res => {
+    pagination.total = res.data.count
+})
 
 // 开课时间和结课时间
 watch(dateRange, () => {
@@ -208,7 +169,9 @@ watch(scheduleRange, () => {
         scheduleRange.value[1].format("HH:mm")
 })
 
-
+/**
+ * 创建新的课程
+ */
 const createCourseSubmit = async () => {
     try {
         await createFormRef.value.validate() // 参数校验失败了
@@ -221,18 +184,30 @@ const createCourseSubmit = async () => {
         return
     }
 }
-
 const showCreateDrawer = () => {
     createState.value = true;
 };
-
-
-const showPublishMedal = (courseID: number) => {
+const showPublishModal = (courseID: number) => {
     publishState.value = true
     publishForm.courseID = courseID
 
 }
+/**
+ * 发布预选课程
+ */
 const publishCourse = () => {
     console.log(publishForm)
+}
+/**
+ * 处理翻页
+ * @param pager
+ */
+const handleTableChange = async (pager: Pager) => {
+    pagination.current = pager.current
+    // 之前请求过，进行往前翻页就行
+    if (Max.value >= pagination.current) return
+    setMax(pagination.current)
+    const res = await useCourse.getMoreCourseList(pagination)
+    pagination.total = res.data.count
 }
 </script>

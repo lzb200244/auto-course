@@ -1,6 +1,8 @@
 import request, {APiResponse, APIResponseList} from "@/api";
 import {CourseReq} from "@/types/request/course.ts";
 import {CourseList} from "@/types/response/course.ts";
+import {Pager} from "@/hooks/pages";
+import {Page} from "@/consts/page.ts";
 
 const createCourse = async (data: CourseReq) => {
     return await request.post<APiResponse<string>>({
@@ -10,12 +12,12 @@ const createCourse = async (data: CourseReq) => {
     });
 }
 //  获取我创建的课程
-const getListCourse = async () => {
+const getListCourse = async (pager: Pager = {current: 1, pageSize: Page.PageSize}) => {
     return await request.get<APIResponseList<CourseList[]>>({
         isAuth: true,
         params: {
-            page: 12,
-            size: 10
+            page: pager.current,
+            size: pager.pageSize
         },
         url: '/course/teacher/'
     });
