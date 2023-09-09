@@ -1,16 +1,19 @@
 import {defineStore} from 'pinia'
-import {CourseList} from "@/types/response/course.ts";
-import {getListCourse} from "@/api/course";
+import {Course, PublishCourse} from "@/types/response/course.ts";
+import {getListCourse, getPublishCourse} from "@/api/course";
 import {Pager} from "@/hooks/pages";
 
 interface State {
-    courseList: CourseList[]
+    courseList: Course[]
+    publishCourseList: PublishCourse[]
+
 }
 
-export const useCourseStore = defineStore('course', {
+export const useCourseStore = defineStore('election', {
     state: (): State => {
         return {
-            courseList: [] as CourseList[],
+            courseList: [] as Course[],
+            publishCourseList: [] as PublishCourse[],
         }
     },
     getters: {},
@@ -26,6 +29,25 @@ export const useCourseStore = defineStore('course', {
             this.courseList = this.courseList.concat(res.data.results)
             return res
 
+        },
+        async getPublishCourseList() {
+            const res = await getPublishCourse()
+            this.publishCourseList = res.data.results
+            return res
+        },
+        async getMorePublishCourseList(pager: Pager) {
+
+            const res = await getPublishCourse(pager)
+            this.publishCourseList = this.publishCourseList.concat(res.data.results)
+            return res
+        },
+        addCourse2PublishCourse(course:Course) {
+            this.publishCourseList.push(<PublishCourse>course  )
+        },
+        cancelPublishCourse(courseID: number) {
+            this.publishCourseList = this.publishCourseList.filter(
+                item => item.id != courseID
+            )
         }
 
     }

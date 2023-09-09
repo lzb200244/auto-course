@@ -16,10 +16,10 @@
                     <a-card :bordered="false">
                         <template #title>
                         </template>
-                        <transition name="slide" mode="out-in">
+<!--                        <transition name="slide" mode="out-in">-->
                             <router-view v-if="GlobalConf.init" />
 
-                        </transition>
+<!--                        </transition>-->
                     </a-card>
                 </a-layout-content>
             </a-layout>
