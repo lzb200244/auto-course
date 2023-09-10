@@ -8,7 +8,7 @@ const createCourse = async (data: CourseReq) => {
     return await request.post<APiResponse<string>>({
         data,
         isAuth: true,
-        url: '/course/teacher/'
+        url: '/courses/'
     });
 }
 //  获取我创建的课程
@@ -19,19 +19,19 @@ const getListCourse = async (pager: Pager = {current: 1, pageSize: Page.PageSize
             page: pager.current,
             size: pager.pageSize
         },
-        url: '/course/teacher/'
+        url: '/courses/'
     });
 }
 const publishCourseApi = async (data: PublishCourseReq) => {
     return await request.post<APiResponse<string>>({
-        url: "/course/teacher/publish",
+        url: "/courses/publish",
         data: data,
         isAuth: true
     })
 }
 const cancelCourseApi = async (courseID: number) => {
     return await request.delete<APiResponse<string>>({
-        url: "/course/teacher/publish",
+        url: "/courses/publish",
         data: {
             courseID
         },
@@ -46,7 +46,7 @@ const getPublishCourse = async (pager: Pager = {current: 1, pageSize: Page.PageS
             page: pager.current,
             size: pager.pageSize
         },
-        url: '/course/teacher/publish'
+        url: '/courses/publish'
     });
 }
 export {

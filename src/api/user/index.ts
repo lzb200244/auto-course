@@ -6,7 +6,7 @@ const asyncLogin = async (data: UserReq) => {
     return await request.post<APiResponse<UserResult>>({
         data,
         isAuth: false,
-        url: '/login'
+        url: 'users/login'
     });
 }
 
@@ -14,7 +14,7 @@ const asyncRegister = async (data: RegisterReq) => {
     return await request.post<APiResponse<string>>({
         data,
         isAuth: false,
-        url: '/register'
+        url: 'users/register'
     });
 }
 
@@ -23,17 +23,16 @@ const getUser = async () => {
 //     获取用户消息
     return await request.get<APiResponse<UserResult>>({
         isAuth: true,
-        url: '/user'
+        url: '/users'
     })
 }
 const updateInfo = async (data: UpdateInfoReq) => {
     return await request.put<APiResponse<string>>({
         isAuth: true,
-        url: '/user',
+        url: '/users',
         data: data
     })
 }
-
 
 export {
     asyncRegister, asyncLogin,

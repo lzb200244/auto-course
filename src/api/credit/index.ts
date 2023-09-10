@@ -1,4 +1,3 @@
-
 import request, {APiResponse} from "@/api";
 
 /**
@@ -8,7 +7,7 @@ import request, {APiResponse} from "@/api";
  const getKodo = async () => {
     return await request.get<APiResponse<string>>({
         isAuth: true,
-        url: '/credit/kodo',
+        url: '/credits/kodo',
     })
 }
 export {

@@ -7,9 +7,9 @@ defineOptions(
 </script>
 
 <template>
-  <div style="background-color: red;">
-      test22
-  </div>
+    <div style="background-color: blue;">
+        test22
+    </div>
 </template>
 
 <style scoped>

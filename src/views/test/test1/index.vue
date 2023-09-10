@@ -1,57 +1,31 @@
 <template>
     <div>
-        <a-breadcrumb :routes="routes">
-            <template #itemRender="{ route, paths }">
-        <span v-if="routes.indexOf(route) === routes.length - 1">
-          {{ route.breadcrumbName }}
-        </span>
-                <router-link v-else :to="`${basePath}/${paths.join('/')}`">
-                    {{ route.breadcrumbName }}
-                </router-link>
-            </template>
-        </a-breadcrumb>
-        <br />
-        {{ $route.path }}
-    </div>
-</template>
-<script lang="ts" setup>
-import { ref } from 'vue';
-interface Route {
-    path: string;
-    breadcrumbName: string;
-    children?: Array<{
-        path: string;
-        breadcrumbName: string;
-    }>;
-}
-const basePath = '/components/breadcrumb';
-const routes = ref<Route[]>([
-    {
-        path: 'index',
-        breadcrumbName: 'home',
-    },
-    {
-        path: 'first',
-        breadcrumbName: 'first',
-        children: [
-            {
-                path: '/general',
-                breadcrumbName: 'General',
-            },
-            {
-                path: '/layout',
-                breadcrumbName: 'Layout',
-            },
-            {
-                path: '/navigation',
-                breadcrumbName: 'Navigation',
-            },
-        ],
-    },
-    {
-        path: 'second',
-        breadcrumbName: 'second',
-    },
-]);
-</script>
+        <a-input v-model:value="val"></a-input>
 
+    </div>
+
+</template>
+<script setup>
+import {ref} from "vue";
+
+const val = ref("")
+
+</script>
+<style>
+/* 可以设置不同的进入和离开动画 */
+/* 设置持续时间和动画函数 */
+.slide-fade-enter-active {
+    transition: all .2s ease;
+}
+
+.slide-fade-leave-active {
+    transition: all .2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+
+.slide-fade-enter, .slide-fade-leave-to {
+    transform: translateX(10px);
+    opacity: 0;
+}
+
+
+</style>
