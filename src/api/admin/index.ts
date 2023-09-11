@@ -1,5 +1,5 @@
 import request, {APiResponse, APIResponseList} from "@/api";
-import {RouteReq} from "@/types/request/admin.ts";
+import {CategoryReq, RouteReq} from "@/types/request/admin.ts";
 import {Pager} from "@/hooks/pages";
 import {Page} from "@/consts/page.ts";
 import {PublishCourse} from "@/types/response/course.ts";
@@ -33,13 +33,22 @@ const notify2Teacher = async () => {
 const getPreloadCourse=async(pager: Pager = {current: 1, pageSize: Page.PageSize})=>{
     return await request.get<APIResponseList<PublishCourse[]>>({
         isAuth: true,
-        url: '/courses',
+        url: '/admin/courses',
         params:{
             page: pager.current,
             size: pager.pageSize
         }
     });
 }
+
+
+const createCategoryAPI = async (data: CategoryReq) => {
+    return await request.post<APiResponse<string>>({
+        data,
+        isAuth: true,
+        url: '/admin/categories'
+    });
+}
 export {
-    createPage, updatePage, notify2Teacher,getPreloadCourse
+    createPage, updatePage, notify2Teacher,getPreloadCourse,createCategoryAPI
 }

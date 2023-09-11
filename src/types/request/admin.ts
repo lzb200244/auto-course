@@ -12,6 +12,11 @@ export interface RouteReq {
     component: string;    // 组件地址、唯一标识
     meta: Meta, // 元信息
     disable: boolean; // 是否禁用
-    property: number; // 权限级
+    role: number[]; // 权限级
     parent: number; // 父级
+}
+export interface CategoryReq {
+    name: string;
+    desc: string;
+
 }

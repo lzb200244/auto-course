@@ -92,6 +92,21 @@ const publishCourseColumns = [
     }
 
 ];
+
+
+const categoryColumns = [
+    {
+        title: '分类名称',
+        dataIndex: 'name',
+        key: 'name',
+    },
+    {
+        title: '分类描述',
+        dataIndex: 'desc',
+        key: 'desc',
+    }
+
+]
 export {
-    courseColumns, publishCourseColumns
+    courseColumns, publishCourseColumns,categoryColumns
 }

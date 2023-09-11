@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
-import {Course, PublishCourse} from "@/types/response/course.ts";
-import {getListCourse, getPublishCourse} from "@/api/course";
+import {Category, Course, PublishCourse} from "@/types/response/course.ts";
+import {getListCategory, getListCourse, getPublishCourse} from "@/api/course";
 import {Pager} from "@/hooks/pages";
 import {getPreloadCourse} from "@/api/admin";
 
@@ -8,6 +8,7 @@ interface State {
     courseList: Course[]
     publishCourseList: PublishCourse[]
     preloadCourseList: PublishCourse[]
+    categoryList: Category[]
 
 }
 
@@ -17,6 +18,7 @@ export const useCourseStore = defineStore('election', {
             courseList: [] as Course[],
             publishCourseList: [] as PublishCourse[],
             preloadCourseList: [] as PublishCourse[],
+            categoryList: [] as Category[]
         }
     },
     getters: {},
@@ -46,7 +48,6 @@ export const useCourseStore = defineStore('election', {
         },
         async getPreloadCourseList() {
             if (this.preloadCourseList.length !== 0) return
-
             const res = await getPreloadCourse()
             this.preloadCourseList = res.data.results
             return res
@@ -59,6 +60,17 @@ export const useCourseStore = defineStore('election', {
             this.preloadCourseList = this.preloadCourseList.concat(res.data.results)
             return res
         },
+        async getCategoryList() {
+            if (this.categoryList.length !== 0) return
+            const res = await getListCategory()
+            this.categoryList = res.data.results
+            return res
+        },
+        async getMoreCategoryList(pager: Pager) {
+            const res=await getListCategory(pager)
+            this.categoryList = this.categoryList.concat(res.data.results)
+            return res
+        },
         addCourse2PublishCourse(course: Course) {
             this.publishCourseList.push(<PublishCourse>course)
         },
@@ -66,6 +78,9 @@ export const useCourseStore = defineStore('election', {
             this.publishCourseList = this.publishCourseList.filter(
                 item => item.id != courseID
             )
+        },
+        addCategory(category: Category) {
+            this.categoryList.push(category)
         }
 
     }

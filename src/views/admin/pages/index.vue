@@ -51,13 +51,14 @@
                             label="是否缓存">
                         <a-switch v-model:checked="formState.meta.keepAlive"/>
                     </a-form-item>
-                    <a-form-item name="property" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
-                        <a-radio-group v-model:value.number="formState.property">
-                            <a-radio v-for="key in roleMap" :key="key[0]" :value="key[0]">
-                                {{ key[1] }}
-                            </a-radio>
-
-                        </a-radio-group>
+                    <a-form-item name="role" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
+                        <a-select
+                                v-model:value="formState.role"
+                                mode="tags"
+                                @change="handleChange"
+                                placeholder="请选择属于关系"
+                                :options="[{ value: 1, label: '管理员' }, { value: 2, label: '教师' }, { value: 3, label: '学生' }]"
+                        ></a-select>
                     </a-form-item>
 
                     <a-form-item
@@ -144,12 +145,14 @@
                     label="是否缓存">
                 <a-switch v-model:checked="updateForm.meta.keepAlive"/>
             </a-form-item>
-            <a-form-item name="property" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
-                <a-radio-group v-model:value.number="updateForm.property">
-                    <a-radio v-for="key in roleMap" :key="key[0]" :value="key[0]">
-                        {{ key[1] }}
-                    </a-radio>
-                </a-radio-group>
+            <a-form-item name="role" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
+                <a-select
+                    v-model:value="formState.role"
+                    mode="tags"
+                    @change="handleChange"
+                    placeholder="请选择属于关系"
+                    :options="roleOptions"
+                ></a-select>
             </a-form-item>
 
             <a-form-item
@@ -169,8 +172,12 @@ import {RouteReq} from "@/types/request/admin.ts";
 import {createPage, updatePage} from "@/api/admin";
 import {message} from "ant-design-vue";
 import {usePermissionStore} from "@/store/modules/permission.ts";
-import {roleMap} from "@/enums/user";
+import {roleOptions} from "@/enums/user.ts";
 
+
+const handleChange=(v :number[])=>{
+    formState.role=v
+}
 const radio = ref(1)
 const usePermission = usePermissionStore()
 const myPages = computed(() => usePermission.myPages)
@@ -185,7 +192,7 @@ const formState = reactive<RouteReq>(
         },
         disable: false,
         parent: 1,
-        property: 0
+        role: []
     }
 );
 const updateForm = reactive<RouteReq>(
@@ -199,7 +206,7 @@ const updateForm = reactive<RouteReq>(
         },
         disable: false,
         parent: 1,
-        property: 0
+        role: []
     }
 );
 const formRef = ref();

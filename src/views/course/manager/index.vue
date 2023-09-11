@@ -38,7 +38,10 @@
                 <a-form-item label="课程分类"
                              :rules="[{ required: true, message: '请输入课程分类' }]"
                              name="categoryID">
-                    <a-input v-model:value.number="createCourseForm.categoryID"/>
+                    <a-select
+                            :options="categoryListOption"
+                            v-model:value="createCourseForm.categoryID"
+                    ></a-select>
                 </a-form-item>
                 <a-form-item label="上课时间"
                              :rules="[{ required: true, message: '请输入上课时间' }]"
@@ -92,6 +95,9 @@
                 <template v-if="column.dataIndex === 'endTime'">
                     <span>{{ dayjs(record.endTime).format('YYYY-MM-DD') }}</span>
                 </template>
+                <template v-if="column.dataIndex==='categoryID'">
+                    111
+                </template>
             </template>
         </a-table>
         <a-modal
@@ -121,12 +127,13 @@
 import dayjs, {Dayjs} from 'dayjs';
 import {CourseReq, PublishCourseReq} from "@/types/request/course.ts";
 import {computed, reactive, ref, watch,} from "vue";
-import {message} from "ant-design-vue";
+import {message, SelectProps} from "ant-design-vue";
 import {courseColumns} from "@/consts/columns.ts";
 import {dateRangeFormat, scheduleRangeFormat} from "@/enums/days.ts";
 import usePager, {Pager} from "@/hooks/pages";
 import {createCourse, publishCourseApi} from "@/api/course";
 import {useCourseStore} from "@/store/modules/course.ts";
+import {Category} from "@/types/response/course.ts";
 
 const isLoading = ref<boolean>(false)
 const {pagination, pageRange, Max, setMax} = usePager()
@@ -153,10 +160,23 @@ const publishCourseForm = reactive<PublishCourseReq>({
     capacity: 0,
     courseID: 0
 })
+
 const useCourse = useCourseStore()
 // 获取课程列表
 useCourse.getCourseList().then(res => {
     pagination.total = res.data.count
+})
+
+useCourse.getCategoryList()
+const categoryListOption = computed<SelectProps['options']>(() => {
+    return useCourse.categoryList.map(
+        (category: Category) => {
+            return {
+                value: category.id,
+                label: category.name
+            }
+        }
+    )
 })
 // 监听开课时间和结课时间的变化
 watch(dateRange, () => {

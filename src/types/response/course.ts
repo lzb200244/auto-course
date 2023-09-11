@@ -24,7 +24,15 @@ interface PublishCourse {
     categoryID: number,
     schedule: string,
 }
+interface Category {
+    id: number,
+    name: string
+    desc: string
+
+}
+
+
 
 export {
-    Course, PublishCourse
+    Course, PublishCourse,Category
 }
