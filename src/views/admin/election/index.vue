@@ -1,6 +1,18 @@
 <template>
-    <a-row>
-        <a-button type="primary" @click="preloadNotify">预发布通知</a-button>
+    <a-row class="my-2">
+        <a-button-group style="margin-left: auto">
+            <a-space>
+                <a-button type="primary" @click="preloadNotify">预发布通知</a-button>
+                <a-popconfirm
+                        title="是否确认发布"
+                        ok-text="确认"
+                        cancel-text="取消"
+                        @confirm="publishCourse">
+                    <a-button type="dashed">发布选课通知</a-button>
+                </a-popconfirm>
+
+            </a-space>
+        </a-button-group>
 
     </a-row>
     <a-row>
@@ -38,7 +50,7 @@
 通知老师发布课程，管理员进行审核。
 审核完成进行课程预热，
 */
-import {notify2Teacher} from "@/api/admin";
+import {notify2Student, notify2Teacher} from "@/api/admin";
 import dayjs from 'dayjs';
 import {computed,} from "vue";
 import {publishCourseColumns} from "@/consts/columns.ts";
@@ -67,6 +79,11 @@ const courseList = computed<PublishCourse[]>(() => {
     return useCourse.preloadCourseList.slice(pageRange.value[0], pageRange.value[1])
 })
 
+const publishCourse = async () => {
+    await notify2Student()
+    message.success("发布成功")
+}
+
 const handleTablePaginationChange = async (pager: Pager) => {
     pagination.current = pager.current
     if (Max.value >= pagination.current) return
@@ -81,7 +98,7 @@ const cancelPublish = async (courseID: number) => {
         useCourse.cancelPublishCourse(courseID)
         message.success("取消成功")
     } catch (e) {
-        message.error("取消失败:" + e.message)
+        // message.error("取消失败:" + e.message)
     }
 }
 
@@ -89,6 +106,3 @@ const formatDate = (date: string) => {
     return dayjs(date).format('YYYY-MM-DD')
 }
 </script>
-<style scoped>
-
-</style>

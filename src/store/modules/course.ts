@@ -5,6 +5,7 @@ import {Pager} from "@/hooks/pages";
 import {getPreloadCourse} from "@/api/admin";
 
 interface State {
+
     courseList: Course[]
     publishCourseList: PublishCourse[]
     preloadCourseList: PublishCourse[]
@@ -12,7 +13,7 @@ interface State {
 
 }
 
-export const useCourseStore = defineStore('election', {
+export const useCourseStore = defineStore('course', {
     state: (): State => {
         return {
             courseList: [] as Course[],

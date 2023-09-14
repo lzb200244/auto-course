@@ -5,7 +5,9 @@ const defaultRoutes: RouteRecordRaw[] = [
         path: "/login",
         name: "login",
         component: () => import('@/views/auth/login'),
+
         meta: {
+
             title: '登录',
             keepAlive: true,
             requireAuth: false

@@ -40,6 +40,10 @@
                         <a-input v-model:value="formState.meta.title"/>
                     </a-form-item>
                     <a-form-item
+                        label="组件图标">
+                        <a-input v-model:value="formState.meta.icon"/>
+                    </a-form-item>
+                    <a-form-item
                             label="是否禁用">
                         <a-switch v-model:checked="formState.disable"/>
                     </a-form-item>
@@ -105,44 +109,38 @@
         </a-col>
     </a-row>
     <a-modal v-model:open="open" @ok="submitUpdateForm">
+        <template #footer/>
         <a-form :model="updateForm" :label-col="labelCol"
                 ref="updateFormRef"
                 :wrapper-col="wrapperCol">
             <a-form-item label="页面名称"
                          name="name"
-                         :rules="[
-            { required: true, message: '请输入页面名称' },
-        ]"
-            >
+                         :rules="[{ required: true, message: '请输入页面名称' },]">
                 <a-input v-model:value="updateForm.name"/>
             </a-form-item>
             <a-form-item name="path" label="页面路由" :rules="[{ required: true, message: '请输入页面路由' }]">
                 <a-input v-model:value="updateForm.path"/>
             </a-form-item>
-            <a-form-item
-                    label="重定向地址">
+            <a-form-item label="重定向地址">
                 <a-input v-model:value="updateForm.redirect"/>
             </a-form-item>
-            <a-form-item
-
-                    label="组件地址">
+            <a-form-item label="组件地址">
                 <a-input v-model:value="updateForm.component"/>
             </a-form-item>
-            <a-form-item
-                    label="组件标题">
+            <a-form-item label="组件标题">
                 <a-input v-model:value="updateForm.meta.title"/>
 
             </a-form-item>
-            <a-form-item
-                    label="是否禁用">
+            <a-form-item label="组件图标">
+                <a-input v-model:value="formState.meta.icon"/>
+            </a-form-item>
+            <a-form-item label="是否禁用">
                 <a-switch v-model:checked="updateForm.disable"/>
             </a-form-item>
-            <a-form-item
-                    label="是否需要认证">
+            <a-form-item label="是否需要认证">
                 <a-switch v-model:checked="updateForm.meta.requireAuth"/>
             </a-form-item>
-            <a-form-item
-                    label="是否缓存">
+            <a-form-item label="是否缓存">
                 <a-switch v-model:checked="updateForm.meta.keepAlive"/>
             </a-form-item>
             <a-form-item name="role" label="属于" :rules="[{ required: true, message: '请输入属于关系' }]">
@@ -160,8 +158,8 @@
                     label="父组件" :rules="[{ required: true, message: '请输入父组件' }]">
                 <a-input v-model:value="updateForm.parent" type="number"/>
             </a-form-item>
-            <a-form-item>
-                <a-button type="primary" @click="submitForm">提交</a-button>
+            <a-form-item style="margin-left: auto;" >
+                <a-button  type="primary" @click="submitForm">提交</a-button>
             </a-form-item>
         </a-form>
     </a-modal>
@@ -189,6 +187,7 @@ const formState = reactive<RouteReq>(
             requireAuth: false,
             title: '',
             keepAlive: false,
+            icon: '',
         },
         disable: false,
         parent: 1,
@@ -203,6 +202,7 @@ const updateForm = reactive<RouteReq>(
             requireAuth: false,
             title: '',
             keepAlive: false,
+            icon: '',
         },
         disable: false,
         parent: 1,

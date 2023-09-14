@@ -1,5 +1,5 @@
 import request, {APiResponse, APIResponseList} from "@/api";
-import {CourseReq, PublishCourseReq} from "@/types/request/course.ts";
+import {CourseReq, PublishCourseReq, UpdateCourseReq} from "@/types/request/course.ts";
 import {Category, Course, PublishCourse} from "@/types/response/course.ts";
 import {Pager} from "@/hooks/pages";
 import {Page} from "@/consts/page.ts";
@@ -49,6 +49,16 @@ const cancelCourseApi = async (courseID: number) => {
     })
 }
 
+
+const updateCourseApi = async (data: UpdateCourseReq) => {
+    return await request.put<APiResponse<string>>({
+        url: "/courses/",
+        data: data,
+        isAuth: true
+    })
+}
+
+
 const getPublishCourse = async (pager: Pager = {current: 1, pageSize: Page.PageSize}) => {
     return await request.get<APIResponseList<PublishCourse[]>>({
         isAuth: true,
@@ -59,6 +69,8 @@ const getPublishCourse = async (pager: Pager = {current: 1, pageSize: Page.PageS
         url: '/courses/publish'
     });
 }
+
+
 export {
-    createCourse, getListCourse, publishCourseApi, cancelCourseApi, getPublishCourse,getListCategory
+    createCourse, getListCourse, publishCourseApi, cancelCourseApi, getPublishCourse, getListCategory, updateCourseApi
 }

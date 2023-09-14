@@ -1,31 +1,31 @@
 <template>
-    <a-row>
-        <a-button @click="showCategoryModal">新建分类</a-button>
+    <a-row class="my-2">
+        <a-button-group style="margin-left: auto">
+            <a-space>
+                <a-button @click="showCategoryModal" type="primary">新建分类</a-button>
+            </a-space>
+        </a-button-group>
         <a-modal v-model:open="categoryModal" title="新建分类">
             <template #footer></template>
             <a-form
+                    ref="formRef"
                     :model="formState"
                     @submit="createCategory"
-                    autocomplete="off"
-            >
+                    autocomplete="off">
                 <a-form-item
                         label="分类名称"
                         name="name"
-                        :rules="[{ required: true, message: '请输入分类名称' }]"
-                >
+                        :rules="[{ required: true, message: '请输入分类名称' }]">
                     <a-input v-model:value="formState.name"/>
                 </a-form-item>
                 <a-form-item
                         label="分类描述"
                         name="desc"
-                        :rules="[{ required: true, message: '请输入分类描述' }]"
-                >
+                        :rules="[{ required: true, message: '请输入分类描述' }]">
                     <a-input v-model:value="formState.desc"/>
                 </a-form-item>
-
-
                 <a-form-item>
-                    <a-button type="primary" html-type="submit">Submit</a-button>
+                    <a-button style="float: right" type="primary" html-type="submit">创建</a-button>
                 </a-form-item>
             </a-form>
         </a-modal>
@@ -53,6 +53,7 @@ import {categoryColumns} from "@/consts/columns.ts";
 import {Category} from "@/types/response/course.ts";
 import usePager, {Pager} from "@/hooks/pages";
 
+const formRef = ref()
 const categoryModal = ref(false)
 const useCourse = useCourseStore()
 
@@ -61,7 +62,6 @@ const categoryList = computed(
 )
 const {pagination, pageRange, Max, setMax} = usePager()
 useCourse.getCategoryList().then(res => {
-    console.log(res?.data.count)
     pagination.total = res?.data.count
 })
 const formState = reactive<CategoryReq>({
@@ -72,14 +72,15 @@ const showCategoryModal = () => {
     categoryModal.value = true
 }
 const createCategory = async () => {
-    try {
-        await createCategoryAPI(formState)
-        useCourse.addCategory(<Category>formState)
-        message.success("创建成功")
-    } catch (e) {
-        console.log(e)
-    }
-
+    formRef.value?.validate().then(async () => {
+        try {
+            await createCategoryAPI(formState)
+            useCourse.addCategory(<Category>formState)
+            message.success("创建成功")
+        } catch (e) {
+            console.log(e)
+        }
+    })
 }
 const handleTablePaginationChange = async (pager: Pager) => {
     pagination.current = pager.current

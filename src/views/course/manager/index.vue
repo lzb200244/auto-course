@@ -1,6 +1,10 @@
 <template>
-    <a-row>
-        <a-button type="primary" @click="openCreateCourseDrawer">新建</a-button>
+    <a-row class="my-2">
+        <a-button-group style="margin-left: auto">
+            <a-space>
+                <a-button type="primary" @click="openCreateCourseDrawer">新建</a-button>
+            </a-space>
+        </a-button-group>
         <a-drawer
                 v-model:open="isCreateDrawerOpen"
                 class="custom-class"
@@ -38,10 +42,7 @@
                 <a-form-item label="课程分类"
                              :rules="[{ required: true, message: '请输入课程分类' }]"
                              name="categoryID">
-                    <a-select
-                            :options="categoryListOption"
-                            v-model:value="createCourseForm.categoryID"
-                    ></a-select>
+                    <course-select v-model:value="createCourseForm.categoryID"/>
                 </a-form-item>
                 <a-form-item label="上课时间"
                              :rules="[{ required: true, message: '请输入上课时间' }]"
@@ -74,20 +75,24 @@
                 @change="handleTablePaginationChange"
         >
             <template #bodyCell="{ column, record }">
+
+
                 <template v-if="column.dataIndex === 'action'">
                     <template v-if="record.isPreLoad">
-                        <a-tag color="green">已经发布</a-tag>
+                        <a-button type="link">已经发布</a-button>
                     </template>
                     <template v-else>
-                        <a-tag class="cursor-pointer" @click="openPublishCourseModal(record.id)">点击发布</a-tag>
+                        <a-button type="link" class="cursor-pointer" @click="openPublishCourseModal(record.id)">
+                            点击发布
+                        </a-button>
                     </template>
                     <a-popconfirm
                             title="是否确认删除该课程"
                             ok-text="确认"
-                            cancel-text="取消"
-                    >
+                            cancel-text="取消">
                         <a-button type="link" danger>删除</a-button>
                     </a-popconfirm>
+                    <a-button type="link" @click="edit(record.id)">编辑</a-button>
                 </template>
                 <template v-if="column.dataIndex === 'startTime'">
                     <span>{{ dayjs(record.startTime).format('YYYY-MM-DD') }}</span>
@@ -95,9 +100,7 @@
                 <template v-if="column.dataIndex === 'endTime'">
                     <span>{{ dayjs(record.endTime).format('YYYY-MM-DD') }}</span>
                 </template>
-                <template v-if="column.dataIndex==='categoryID'">
-                    111
-                </template>
+
             </template>
         </a-table>
         <a-modal
@@ -121,27 +124,80 @@
                 </a-form-item>
             </a-form>
         </a-modal>
+        <a-modal
+                ok-text="确认修改"
+                cancel-text="取消修改"
+                v-model:open="isUpdateModalOpen"
+                title="修改课程"
+                @ok="upDateCourse"
+                @cancel="cancel"
+        >
+            <a-form
+                    ref="updateDataFormRef"
+                    autocomplete="off"
+                    :model="updateDataForm"
+            >
+                <a-form-item
+                        label="课程名称"
+                        name="title"
+                        :rules="[{ required: true, message: '请输入课程名称'}]"
+                >
+                    <a-input v-model:value="updateDataForm.title"/>
+                </a-form-item>
+                <a-form-item
+                        label="课程描述"
+                        name="desc"
+                        :rules="[{ required: true, message: '请输入课程描述'}]"
+                >
+                    <a-input v-model:value="updateDataForm.desc"/>
+                </a-form-item>
+                <a-form-item
+                        label="课程学分"
+                        name="credit"
+                        :rules="[{ required: true, message: '请输入课程学分',min:0,type:'number'}]"
+                >
+                    <a-input v-model:value.number="updateDataForm.credit" type="number" min="0"/>
+                </a-form-item>
+                <a-form-item
+                        label="课程分类"
+                        name="categoryID"
+                        :rules="[{ required: true, message: '请输入课程分类'}]"
+                >
+                    <course-select v-model:value="updateDataForm.categoryID"/>
+                </a-form-item>
+                <a-form-item
+                        label="上课时间段"
+                        name="schedule"
+                        :rules="[{ required: true, message: '请输入上课时间段'}]"
+                >
+                    <a-input v-model:value="updateDataForm.schedule"/>
+                </a-form-item>
+            </a-form>
+        </a-modal>
     </a-row>
 </template>
 <script setup lang="ts">
 import dayjs, {Dayjs} from 'dayjs';
-import {CourseReq, PublishCourseReq} from "@/types/request/course.ts";
+import {CourseReq, PublishCourseReq, UpdateCourseReq} from "@/types/request/course.ts";
 import {computed, reactive, ref, watch,} from "vue";
-import {message, SelectProps} from "ant-design-vue";
+import {message} from "ant-design-vue";
 import {courseColumns} from "@/consts/columns.ts";
 import {dateRangeFormat, scheduleRangeFormat} from "@/enums/days.ts";
 import usePager, {Pager} from "@/hooks/pages";
-import {createCourse, publishCourseApi} from "@/api/course";
+import {createCourse, publishCourseApi, updateCourseApi} from "@/api/course";
 import {useCourseStore} from "@/store/modules/course.ts";
-import {Category} from "@/types/response/course.ts";
+import CourseSelect from "@/components/course/select/index.vue";
 
 const isLoading = ref<boolean>(false)
 const {pagination, pageRange, Max, setMax} = usePager()
 const createFormRef = ref();
+const updateDataFormRef = ref()
+
 const dateRange = ref<[Dayjs, Dayjs]>([]);
 const scheduleRange = ref<[Dayjs, Dayjs]>([]);
 const isCreateDrawerOpen = ref<boolean>(false);
 const isPublishModalOpen = ref<boolean>(false);
+const isUpdateModalOpen = ref<boolean>(false);
 const courseList = computed(() => {
     return useCourse.courseList.slice(pageRange.value[0], pageRange.value[1])
 })
@@ -160,24 +216,36 @@ const publishCourseForm = reactive<PublishCourseReq>({
     capacity: 0,
     courseID: 0
 })
-
 const useCourse = useCourseStore()
 // 获取课程列表
 useCourse.getCourseList().then(res => {
     pagination.total = res.data.count
 })
 
-useCourse.getCategoryList()
-const categoryListOption = computed<SelectProps['options']>(() => {
-    return useCourse.categoryList.map(
-        (category: Category) => {
-            return {
-                value: category.id,
-                label: category.name
-            }
-        }
-    )
-})
+const updateDataForm = ref<UpdateCourseReq>({} as UpdateCourseReq)
+const edit = (id: number) => {
+    isUpdateModalOpen.value = true
+    const item = courseList.value.filter(item => id === item.id)[0]
+    updateDataForm.value.id = id
+    updateDataForm.value.title = item.title
+    updateDataForm.value.desc = item.desc
+    updateDataForm.value.credit = item.credit
+    updateDataForm.value.categoryID = item.categoryID
+    updateDataForm.value.schedule = item.schedule
+};
+
+const upDateCourse = async () => {
+    await updateDataFormRef.value.validate()
+    await updateCourseApi(updateDataForm.value)
+    const item = courseList.value.filter(item => updateDataForm.value.id === item.id)[0]
+    Object.assign(item, updateDataForm.value)
+    message.success("修改课程成功")
+}
+
+const cancel = () => {
+    updateDataForm.value = {} as UpdateCourseReq
+    isUpdateModalOpen.value = false
+};
 // 监听开课时间和结课时间的变化
 watch(dateRange, () => {
     createCourseForm.startTime = dateRange.value[0].toDate().getTime()

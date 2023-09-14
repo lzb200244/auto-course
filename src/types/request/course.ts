@@ -9,6 +9,11 @@ export interface CourseReq {
     startTime: number;
     endTime: number;
 }
+
+export interface UpdateCourseReq extends Pick<CourseReq, 'title' | 'desc' | 'credit' | 'categoryID' | 'schedule'> {
+    id: number;
+}
+
 export interface PublishCourseReq {
     capacity: number,
     courseID: number

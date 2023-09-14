@@ -7,11 +7,11 @@ export interface Pager {
     total?: number
 }
 
-const usePager = () => {
+const usePager = (size: number=Page.PageSize) => {
     const Max = ref(0)
     const pagination = reactive<Pager>({
         current: 1,
-        pageSize: Page.PageSize,
+        pageSize:size ,
         total: 0
     })
     /**

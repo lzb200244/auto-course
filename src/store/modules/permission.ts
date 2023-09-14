@@ -1,7 +1,6 @@
 import {defineStore} from 'pinia'
 import {getRoutes} from "@/api/permission";
-import {filterAsnycRouter} from "@/router/importRoutercom.ts";
-import { useRouter} from "vue-router";
+
 
 
 interface State {

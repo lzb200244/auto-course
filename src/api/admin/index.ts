@@ -29,12 +29,22 @@ const notify2Teacher = async () => {
     });
 }
 
+/**
+ * 通知学生选课
+ */
+const notify2Student = async () => {
+    return await request.post<APiResponse<string>>({
+        isAuth: true,
+        url: '/admin/students/notify'
+    });
+}
 
-const getPreloadCourse=async(pager: Pager = {current: 1, pageSize: Page.PageSize})=>{
+
+const getPreloadCourse = async (pager: Pager = {current: 1, pageSize: Page.PageSize}) => {
     return await request.get<APIResponseList<PublishCourse[]>>({
         isAuth: true,
         url: '/admin/courses',
-        params:{
+        params: {
             page: pager.current,
             size: pager.pageSize
         }
@@ -50,5 +60,5 @@ const createCategoryAPI = async (data: CategoryReq) => {
     });
 }
 export {
-    createPage, updatePage, notify2Teacher,getPreloadCourse,createCategoryAPI
+    createPage, updatePage, notify2Teacher, getPreloadCourse, createCategoryAPI, notify2Student
 }

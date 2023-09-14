@@ -3,6 +3,7 @@ interface Meta {
     requireAuth: boolean
     title: string
     keepAlive: boolean
+    icon: string
 }
 
 export interface RouteReq {
