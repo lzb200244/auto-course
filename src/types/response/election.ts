@@ -7,12 +7,19 @@ interface SelectCourse {
     credit: number,
     cover: string,
     capacity: number,
+    left: number,
     categoryID: number,
     isPreLoad: boolean,
     schedule: string,
     startTime: number,
     endTime: number
 }
+
+interface Election {
+    capacity: number
+    courseID: number
+}
+
 export {
-    SelectCourse
+    SelectCourse,Election
 }

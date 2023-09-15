@@ -88,7 +88,7 @@ const handleTablePaginationChange = async (pager: Pager) => {
     pagination.current = pager.current
     if (Max.value >= pagination.current) return
     setMax(pagination.current)
-    const res = await useCourse.getMorePreloadCourseList(pagination)
+    const res = await useCourse.getMoreSelectCourseList(pagination)
     pagination.total = res?.data.count
 }
 

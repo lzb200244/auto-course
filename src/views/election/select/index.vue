@@ -47,20 +47,20 @@
             </a-float-button>
             <a-back-top :visibility-height="0"/>
         </a-float-button-group>
-
         <a-drawer
-                width="50%"
+                width="45%"
                 v-model:open="open"
                 title="我选择的课程"
                 placement="right">
             <a-list
                     item-layout="vertical"
                     :data-source="mySelectCourseList"
-                    style="width: 100%;"
-            >
+                    style="width: 100%;">
                 <template #renderItem="{ item }">
                     <a-list-item>
-
+                        <template #actions>
+                            <a-button @click="cancelCourse(item.id)">退课</a-button>
+                        </template>
                         <a-list-item-meta>
                             <template #description>
                                 <a-space>
@@ -83,29 +83,39 @@
                 item-layout="horizontal"
                 :data-source="selectCourseList"
                 :pagination="pagination"
-                style="width: 100%;"
-        >
+                style="width: 100%;">
             <template #renderItem="{ item }">
-                    <a-list-item>
-                        <template #actions>
-                            <a-button @click="selectCourse(item)">选择</a-button>
+                <a-list-item>
+                    <template #actions>
+                        <template v-if="mySelectedList.includes(item.id)">
+                            <a-button @click="myCar" type="primary">已选择</a-button>
                         </template>
-                        <a-list-item-meta>
-                            <template #description>
-                                <a-space>
-                                    <span>课程编号：{{ item.code }}</span>
-                                    <span>容量：{{ item.capacity }}</span>
-                                    <span>教师：{{ item.teacher }}</span>
-                                    <span>学分：{{ item.credit }}</span>
-                                    <span>时间：{{ item.schedule }}</span>
-                                </a-space>
+                        <template v-else>
+                            <template v-if="item.left === 0">
+                                <a-button disabled>已选满</a-button>
                             </template>
-                            <template #title>
-                                <router-link to="">{{ item.title }}</router-link>
-                            </template>
-                        </a-list-item-meta>
-                    </a-list-item>
+                            <template v-else>
 
+                                <a-button :loading="false" @click="selectCourse(item.id)">选择</a-button>
+                            </template>
+                        </template>
+                    </template>
+                    <a-list-item-meta>
+                        <template #description>
+                            <a-space>
+                                <span>课程编号：{{ item.code }}</span>
+                                <span>容量：{{ item.capacity }}</span>
+                                <span>剩余：{{ item.left }}</span>
+                                <span>教师：{{ item.teacher }}</span>
+                                <span>学分：{{ item.credit }}</span>
+                                <span>时间：{{ item.schedule }}</span>
+                            </a-space>
+                        </template>
+                        <template #title>
+                            <router-link to="">{{ item.title }}</router-link>
+                        </template>
+                    </a-list-item-meta>
+                </a-list-item>
             </template>
         </a-list>
     </a-row>
@@ -117,22 +127,29 @@ import {useCourseStore} from "@/store/modules/course.ts";
 import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
 import {SearchOutlined, MenuOutlined, RiseOutlined, ShoppingCartOutlined} from "@ant-design/icons-vue"
-import {SelectCourse} from "@/types/response/election.ts";
 import {message} from "ant-design-vue";
 
 const formState = ref({
     q: undefined,
     option: undefined
 })
+
 const open = ref(false)
 const isLoading = ref(false)
+let max = 1
+const selectKey = 'select';
 const pagination = {
     current: 1,
     pageSize: 3,
     total: 8,
     onChange: function (page: number) {
+        if (page <= max) {
+            this.current = page
+            return
+        }
+        max = page
         this.current = page
-        election.getMorePreloadCourseList(
+        election.getMoreSelectCourseList(
             {
                 title: formState.value.q,
                 category: formState.value.option,
@@ -149,16 +166,21 @@ const election = useElectionStore()
 const categoryList = computed(() => course.categoryList)
 const selectCourseList = computed(() => election.selectCourseList)
 const mySelectCourseList = computed(() => election.mySelectCourseList)
+const mySelectedList = computed(() => election.mySelectList)
 course.getCategoryList()
 election.getSelectCourseList(
     {
+        page: pagination.current,
+        size: pagination.pageSize,
         title: formState.value.q,
         category: formState.value.option,
-
     }
 ).then(() => {
     isLoading.value = false
 })
+
+
+election.getMySelectCourseList()
 const reset = async () => {
     isLoading.value = true
     await router.replace({
@@ -173,7 +195,6 @@ const reset = async () => {
     })
     pagination.current = 1
     isLoading.value = false
-
 }
 const onSearch = async () => {
     isLoading.value = true
@@ -195,8 +216,24 @@ const onSearch = async () => {
 const myCar = () => {
     open.value = true
 }
-const selectCourse = (item: SelectCourse) => {
-    election.pushMySelectCourseList(item)
-    message.success("选择成功")
+const selectCourse = async (courseID: number) => {
+
+    if (mySelectCourseList.value.length === 5) {
+        message.warn("每人仅限选5门")
+        return
+    }
+    message.loading({content: '正在激烈抢课中...', key: selectKey, duration: 5});
+    try {
+        await election.pushMySelectCourseList(courseID)
+        message.success({content: '选课成功', key: selectKey, duration: 2});
+    } catch (e) {
+        // 课程抢完了，进行设置课程为0
+        election.setCourse2Zero(courseID)
+    }
+
+}
+const cancelCourse = async (courseID: number) => {
+    await election.removeMySelectCourse(courseID)
+    message.info("退课成功")
 }
 </script>

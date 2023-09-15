@@ -53,7 +53,7 @@ export const useCourseStore = defineStore('course', {
             this.preloadCourseList = res.data.results
             return res
         },
-        async getMorePreloadCourseList(pager: Pager) {
+        async getMoreSelectCourseList(pager: Pager) {
 
             const res = await getPreloadCourse(pager)
             //         this.publishCourseList = this.publishCourseList.concat(res.data.results)

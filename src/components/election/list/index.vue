@@ -15,6 +15,7 @@
                         <a-space>
                             <span>课程编号：{{ item.code }}</span>
                             <span>容量：{{ item.capacity }}</span>
+                            <span>剩余：{{item.left}}</span>
                             <span>教师：{{ item.teacher }}</span>
                             <span>学分：{{ item.credit }}</span>
                             <span>时间：{{ item.schedule }}</span>
@@ -67,7 +68,7 @@ const pagination = {
     total: 8,
     onChange: function (page: number) {
         this.current = page
-        useElection.getMorePreloadCourseList(
+        useElection.getMoreSelectCourseList(
             {
                 title: formState.value.q,
                 category: formState.value.option,

@@ -49,7 +49,7 @@ class Request {
             const {data, status} = response
             if (status >= responseCode.Error) {
                 // 服务端错误
-                message.error(data.error)
+                message.error(data.error ?? "服务端异常")
             } else {
                 message.info(data.msg)
             }
@@ -110,7 +110,7 @@ class Request {
 
 const conf: RequestConfig = {
     baseURL: '/api/v1',
-    timeout: 1000,
+    timeout: 5000,
     withCredentials: true,
     isAuth: false,
 
